@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+	<api-gateway:autodiscovery apiId="16477405" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="ecc4020a-eb11-49fe-9fc8-372e414c4d9f" flowRef="version-2-demoFlow" />
+	<flow name="version-2-demoFlow" doc:id="47ae5ee6-50e0-49fd-96ab-7f366b4a9e64" >
+		<scheduler doc:name="Scheduler" doc:id="c642825b-bc67-43b7-979f-190c9f77aa98" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="60" timeUnit="SECONDS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" doc:name="Logger" doc:id="92ac3b69-aad6-4d45-be02-8a0a8cd21ed7" message="V2 Flow"/>
+		<ee:transform doc:name="Transform Message" doc:id="df9704ee-1352-4d4a-bcff-5cec62f25b41" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	apiVersion: "V2"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#['Hello World']" doc:name="Set Variable" doc:id="ea14cb8d-97ab-4722-8be1-91f5a06366dc" variableName="hello"/>
+		<until-successful maxRetries="3" doc:name="Until Successful" doc:id="332c5c83-b6af-46df-ac70-cd6c5164857a" millisBetweenRetries="10000">
+			<logger level="INFO" doc:name="Logger" doc:id="e7e79eff-4dee-46f5-b353-fc57c4aeccbb" message="Inside Until Successful"/>
+			<logger level="INFO" doc:name="Logger" doc:id="67ba75df-0a05-4ef9-8b2a-beb8d21c7a34" message="#[vars.hello]"/>
+			<set-variable value="#['Hi World' ++ null]" doc:name="Set Variable" doc:id="badfd4e8-3721-44e4-bbef-48248a5f99c4" variableName="hello"/>
+			<logger level="INFO" doc:name="Logger" doc:id="465b2c86-b37e-4c1c-8194-3ee31d6d60ab" message="#[vars.hello]"/>
+			<logger level="INFO" doc:name="Logger" doc:id="1f31968d-1a38-4c3e-b71a-b8498151d31a" message="Variable modified in until successful"/>
+		</until-successful>
+		<logger level="INFO" doc:name="Logger" doc:id="4f0cee19-6858-4def-9ba5-7ab772741739" message="Variable outside until successful"/>
+		<logger level="INFO" doc:name="Logger" doc:id="94c4ec45-a513-4822-881e-66e2ebf014e1" message="#[vars.hello]"/>
+	</flow>
+</mule>
